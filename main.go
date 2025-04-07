@@ -3,6 +3,7 @@ package main
 import (
     "html/template"
     "net/http"
+    "os"
 )
 
 type Message struct {
@@ -16,8 +17,12 @@ func main() {
     http.HandleFunc("/", chatPage)
     http.HandleFunc("/send", handleSend)
 
-    println("Servidor corriendo en http://localhost:8080")
-    http.ListenAndServe(":8080", nil)
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080" // para pruebas locales
+    }
+    println("Servidor corriendo en el puerto " + port)
+    http.ListenAndServe(":" + port, nil)
 }
 
 func chatPage(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +35,6 @@ func handleSend(w http.ResponseWriter, r *http.Request) {
     userMsg := r.FormValue("message")
     messages = append(messages, Message{"Usuario", userMsg})
 
-    // Respuesta básica del bot
     var botResponse string
     switch userMsg {
     case "sí", "acepto":
